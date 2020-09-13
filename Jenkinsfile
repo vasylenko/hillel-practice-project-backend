@@ -2,7 +2,6 @@ pipeline{
     agent any
     environment {
       ECR_URL = '199495248340.dkr.ecr.us-east-1.amazonaws.com/tiab-tech-conduit'
-      ECS_UPD = 'aws ecs update-service --cluster tiab-tech --service conduit --force-new-deployment --region us-east-1'
       CLUSTER_NAME = 'tiab-tech'
       ECS_SERVICE_NAME = 'conduit'
       AWS_DEFAULT_REGION = 'us-east-1'
