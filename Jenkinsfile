@@ -1,49 +1,49 @@
 pipeline{
     agent any
+    environment {
+      ECR_URL = '199495248340.dkr.ecr.us-east-1.amazonaws.com/tiab-tech-conduit'
+      ECS_UPD = 'aws ecs update-service --cluster tiab-tech --service conduit --force-new-deployment --region us-east-1'
+      CLUSTER_NAME = 'tiab-tech'
+      ECS_SERVICE_NAME = 'conduit'
+      AWS_DEFAULT_REGION = 'us-east-1'
+    }
     stages{
         stage("Build"){
             steps{
-                echo "========executing Build ========"
-            }
-            post{
-                always{
-                    echo "========always========"
-                }
-                success{
-                    echo "========A executed successfully========"
-                }
-                failure{
-                    echo "========A execution failed========"
-                }
+                sh """
+                docker build -t ${ECR_URL} .
+                """
             }
         }
         stage("Deploy"){
+            agent {
+                docker {
+                    image 'amazon/aws-cli'
+                    reuseNode true
+                    args '--entrypoint=""'
+                }
+            }          
             steps{
-                echo "====++++executing Deploy++++===="
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID', 
+                    credentialsId: 'aws_creds', 
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                        sh """
+                        aws ecr get-login-password | docker login --username AWS --password-stdin \
+                        199495248340.dkr.ecr.us-east-1.amazonaws.com
+                        
+                        docker push ${ECR_URL}
+
+                        aws ecs update-service --cluster ${CLUSTER_NAME} --service #{ECS_SERVICE_NAME} --force-new-deployment 
+                        """
+                    }
             }
-            post{
-                always{
-                    echo "====++++always++++===="
-                }
-                success{
-                    echo "====++++Deploy executed successfully++++===="
-                }
-                failure{
-                    echo "====++++Deploy execution failed++++===="
-                }
-        
-            }
-        }
     }
     post{
         always{
-            echo "========always========"
-        }
-        success{
-            echo "========pipeline executed successfully ========"
-        }
-        failure{
-            echo "========pipeline execution failed========"
+            cleanWs()
         }
     }
 }
