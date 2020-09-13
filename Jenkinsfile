@@ -11,7 +11,7 @@ pipeline{
         stage("Build"){
             steps{
                 sh """
-                docker build -t ${ECR_URL} .
+                docker build -t ${env.ECR_URL} .
                 """
             }
         }
@@ -27,13 +27,12 @@ pipeline{
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                         sh """
-                        env
                         aws ecr get-login-password | docker login --username AWS --password-stdin \
                         199495248340.dkr.ecr.us-east-1.amazonaws.com
                         
-                        docker push ${ECR_URL}
+                        docker push ${env.ECR_URL}
 
-                        aws ecs update-service --cluster ${CLUSTER_NAME} --service #{ECS_SERVICE_NAME} --force-new-deployment 
+                        aws ecs update-service --cluster ${env.CLUSTER_NAME} --service ${env.ECS_SERVICE_NAME} --force-new-deployment 
                         """
                     }
             }
