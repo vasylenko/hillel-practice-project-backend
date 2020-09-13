@@ -17,7 +17,7 @@ pipeline{
         }
         stage("Deploy"){
             agent {
-                label 'seconday-node'
+                label 'secondary-node'
             }          
             steps{
                 withCredentials([[
