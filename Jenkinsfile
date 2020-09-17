@@ -2,7 +2,7 @@ pipeline{
     agent any
 
     environment {
-      ECR_URI = '199495248340.dkr.ecr.us-east-1.amazonaws.com/tiab-tech-conduit'
+      IMAGE_NAME = 'tiab-tech-conduit'
       ECR_URL = '199495248340.dkr.ecr.us-east-1.amazonaws.com'
       CLUSTER_NAME = 'tiab-tech'
       ECS_SERVICE_NAME = 'conduit'
@@ -13,7 +13,7 @@ pipeline{
         stage("Build"){
             steps{
                 sh """
-                docker build -t ${env.ECR_URI} .
+                docker build -t ${env.ECR_URL}/${env.IMAGE_NAME} .
                 """
             }
         }
@@ -33,7 +33,7 @@ pipeline{
                         aws ecr get-login-password | docker login --username AWS --password-stdin \
                         ${env.ECR_URL}
                         
-                        docker push ${env.ECR_URI}
+                        docker push ${env.ECR_URL}/${env.IMAGE_NAME}
 
                         aws ecs update-service --cluster ${env.CLUSTER_NAME} --service ${env.ECS_SERVICE_NAME} \
                         --force-new-deployment 
