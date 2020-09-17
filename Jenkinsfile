@@ -29,7 +29,6 @@ pipeline{
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                         sh """
-                        env 
                         aws ecr get-login-password | docker login --username AWS --password-stdin \
                         ${env.ECR_URL}
                         
