@@ -1,0 +1,6 @@
+    environment {
+      ECR_URL = '199495248340.dkr.ecr.us-east-1.amazonaws.com/tiab-tech-conduit'
+      CLUSTER_NAME = 'tiab-tech'
+      ECS_SERVICE_NAME = 'conduit'
+      AWS_DEFAULT_REGION = 'us-east-1'
+    }
