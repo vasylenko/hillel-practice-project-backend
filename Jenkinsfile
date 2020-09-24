@@ -15,7 +15,7 @@ pipeline{
                         regionName: "${env.AWS_DEFAULT_REGION}"
                     ){
                         sh """
-                        docker build -t ${params.ECR_URL}/${params.IMAGE_NAME} .
+                        docker build -t ${env.ECR_URL}/${env.IMAGE_NAME} .
                         """
                     }
             }
@@ -41,9 +41,9 @@ pipeline{
                         aws ecr get-login-password | docker login --username AWS --password-stdin \
                         ${env.ECR_URL}
                         
-                        docker push ${params.ECR_URL}/${params.IMAGE_NAME}
+                        docker push ${env.ECR_URL}/${env.IMAGE_NAME}
 
-                        aws ecs update-service --cluster ${params.CLUSTER_NAME} --service ${params.ECS_SERVICE_NAME} \
+                        aws ecs update-service --cluster ${env.CLUSTER_NAME} --service ${env.ECS_SERVICE_NAME} \
                         --force-new-deployment 
                         """
                     }
